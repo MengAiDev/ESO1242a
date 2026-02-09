@@ -29,10 +29,11 @@ class StarFieldAnimation(Scene):
             stars = data['stars']
             print(f"原始星星数量: {len(stars)}")
 
-            stars = sorted(stars, key=lambda s: s['intensity'], reverse=True)
-            stars = stars[:1500] 
-
-            print(f"保留最亮的 {len(stars)} 颗星星用于渲染")
+            if len(stars) > 5000:
+                stars = list(np.random.choice(len(stars), 5000, replace=False))
+                stars = [data['stars'][i] for i in stars]
+            
+            print(f"随机选择了 {len(stars)} 颗星星用于渲染")
         except FileNotFoundError:
             print("未找到 star_positions.json，使用随机星星")
             stars = []
@@ -54,8 +55,8 @@ class StarFieldAnimation(Scene):
             ys = [s['y'] for s in stars]
             max_x = max(abs(x) for x in xs) or 1
             max_y = max(abs(y) for y in ys) or 1
-            scale_x = 6.0 / max_x
-            scale_y = 3.0 / max_y
+            scale_x = 4.0 / max_x
+            scale_y = 2.0 / max_y
         else:
             scale_x = scale_y = 1
 
@@ -230,3 +231,15 @@ class StarFieldAnimation(Scene):
         self.wait(3)
         self.play(FadeOut(ending), run_time=2)
 
+# === 运行配置 ===
+if __name__ == "__main__":
+    config.frame_size = (1920, 1080)
+    config.pixel_width = 1920
+    config.pixel_height = 1080
+    config.frame_rate = 30
+    config.background_color = BLACK
+    config.output_file = "ESO1242a_star_field.mp4"
+
+    scene = StarFieldAnimation()
+    scene.render()
+    print("✅ 动画已生成: ESO1242a_star_field.mp4")
